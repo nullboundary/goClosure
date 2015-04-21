@@ -3,7 +3,13 @@ A simple utility to concat and minify javascript files via the Google Closure co
 
 If you just want a simple binary or go solution for minifying javascript, or if you just don't want or can't install Node.js to use Grunt or Gulp, then goClosure is for you. 
 
-#### Commands:
+### go install
+
+```
+go install github.com/nullboundary/goClosure
+```
+
+## Usage
 
 ```	
 COMMANDS:
@@ -17,7 +23,7 @@ GLOBAL OPTIONS:
    --version, -v	print the version
 ```
 
-Concat
+### Concat javascript files into one file
 
 ```	
 NAME:
@@ -35,7 +41,34 @@ OPTIONS:
 
 ```
 
-Minify
+
+Create or use an html file that lists your js files in the order you would like to concat them. 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sample</title>
+</head>
+<body>
+  <p>Go Closure</p>
+  <script type="text/javascript" src="/assets/js/earlyload.js"></script>
+  <!-- External libraries will be ignored -->
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <!-- -p oldpath:newpath flag can replace the file path to match the local directory -->
+  <script type="text/javascript" src="/assets/js/lib.js"></script>
+  <script type="text/javascript" src="/assets/js/site.js"></script>
+</body>
+</html>
+```
+
+Example:
+```
+goClosure concat index.html site.min.js -m /assets/js -p /assets/:www/
+```
+
+### Minify one js file via Google Closure Compiler API
 
 ```	
 NAME:
@@ -49,8 +82,12 @@ DESCRIPTION:
 
 
 ```
+Example:
+```
+goClosure minify site.js site.min.js
+```
 
-All
+### Concat and Minify
 
 ```	
 NAME:
@@ -66,4 +103,8 @@ OPTIONS:
    --path, -p "none"	Changes the path root for the js files listed in the html input file. Syntax <oldPath>:<newPath>
    --modify, -m "none"	Changes input html file <script> tags replacing the many old js files with one concated new file
 
+```
+Example:
+```
+goClosure all index.html site.min.js -m /assets/js -p /assets/:www/
 ```
