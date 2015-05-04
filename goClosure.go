@@ -13,7 +13,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/codegangsta/cli"
-	//"golang.org/x/net/html"
 )
 
 type closureRes struct {
@@ -84,8 +83,18 @@ func main() {
 			Action:      concatCommand,
 		},
 		{
-			Name:        "minify",
-			ShortName:   "m",
+			Name:      "minify",
+			ShortName: "m",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "advanced,a",
+					Usage: "sets compilation level to advanced",
+				},
+				cli.BoolFlag{
+					Name:  "whitespace,w",
+					Usage: "sets compilation level to white space only",
+				},
+			},
 			Usage:       "Minify one js file via Google Closure Compiler API",
 			Description: "goClosure minify <inputfile> <outputfile>",
 			Action:      minifyCommand,
@@ -103,6 +112,14 @@ func main() {
 					Name:  "modify, m",
 					Value: "none",
 					Usage: "Changes input html file <script> tags replacing the many old js files with one concated new file",
+				},
+				cli.BoolFlag{
+					Name:  "advanced,a",
+					Usage: "sets compilation level to advanced",
+				},
+				cli.BoolFlag{
+					Name:  "whitespace,w",
+					Usage: "sets compilation level to white space only",
 				},
 			},
 			Usage:       "Both Concat and Minify. Input is same as concat",
@@ -158,7 +175,18 @@ func minifyCommand(c *cli.Context) {
 
 	//send to be minified
 	fmt.Println("Minifying file...")
-	respData := minify(string(jsFileData))
+	if c.Bool("advanced") && c.Bool("whitespace") {
+		cli.ShowCommandHelp(c, "minify")
+		return
+	}
+	compileLevel := "SIMPLE_OPTIMIZATIONS" //default
+	switch {
+	case c.Bool("advanced"):
+		compileLevel = "ADVANCED_OPTIMIZATIONS"
+	case c.Bool("whitespace"):
+		compileLevel = "WHITESPACE_ONLY"
+	}
+	respData := minify(string(jsFileData), compileLevel)
 
 	//save results
 	err = ioutil.WriteFile(c.Args().Get(1), []byte(respData.CompiledCode), 0644)
@@ -182,7 +210,18 @@ func allCommand(c *cli.Context) {
 
 	//send to be minified
 	fmt.Println("Minifying files...")
-	respData := minify(strings.Join(jsFileData, "\n"))
+	if c.Bool("advanced") && c.Bool("whitespace") {
+		cli.ShowCommandHelp(c, "all")
+		return
+	}
+	compileLevel := "SIMPLE_OPTIMIZATIONS" //default
+	switch {
+	case c.Bool("advanced"):
+		compileLevel = "ADVANCED_OPTIMIZATIONS"
+	case c.Bool("whitespace"):
+		compileLevel = "WHITESPACE_ONLY"
+	}
+	respData := minify(strings.Join(jsFileData, "\n"), compileLevel)
 
 	//save results
 	err := ioutil.WriteFile(c.Args().Get(1), []byte(respData.CompiledCode), 0644)
@@ -198,7 +237,7 @@ func allCommand(c *cli.Context) {
 }
 
 //minify connects to the closure compiler api and returns the minified result
-func minify(jsData string) closureRes {
+func minify(jsData string, compileLevel string) closureRes {
 
 	//build url
 	apiUrl := "http://closure-compiler.appspot.com"
@@ -215,7 +254,7 @@ func minify(jsData string) closureRes {
 	//encode url parameters
 	data := url.Values{}
 	data.Set("js_code", jsData)
-	data.Add("compilation_level", "SIMPLE_OPTIMIZATIONS")
+	data.Add("compilation_level", compileLevel)
 	data.Add("language", "ECMASCRIPT5_STRICT")
 	data.Add("output_format", "json")
 	data.Add("output_info", "compiled_code")
