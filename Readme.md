@@ -1,7 +1,7 @@
 # goClosure
-A simple utility to concat and minify javascript files via the Google Closure compiler API. 
+A simple utility to concat and minify javascript files via the Google Closure compiler API.
 
-If you just want a simple binary or go solution for minifying javascript, or if you just don't want or can't install Node.js to use Grunt or Gulp, then goClosure is for you. 
+If you just want a simple binary or go solution for minifying javascript, or if you just don't want or can't install Node.js to use Grunt or Gulp, then goClosure is for you.
 
 ### go install
 
@@ -11,13 +11,13 @@ go install github.com/nullboundary/goClosure
 
 ## Usage
 
-```	
+```
 COMMANDS:
    concat, c	Read an html file and concat the js files in order
    minify, m	Minify one js file via Google Closure Compiler API
    all, a	Both Concat and Minify. Input is same as concat
    help, h	Shows a list of commands or help for one command
-   
+
 GLOBAL OPTIONS:
    --help, -h		show help
    --version, -v	print the version
@@ -25,7 +25,7 @@ GLOBAL OPTIONS:
 
 ### Concat javascript files into one file
 
-```	
+```
 NAME:
    concat - Read an html file and concat the js files in order
 
@@ -42,7 +42,7 @@ OPTIONS:
 ```
 
 
-Create or use an html file that lists your js files in the order you would like to concat them. 
+Create or use an html file that lists your js files in the order you would like to concat them.
 
 ```html
 <!DOCTYPE html>
@@ -70,7 +70,7 @@ goClosure concat index.html site.min.js -m /assets/js -p /assets/:www/
 
 ### Minify one js file via Google Closure Compiler API
 
-```	
+```
 NAME:
    minify - Minify one js file via Google Closure Compiler API
 
@@ -80,16 +80,19 @@ USAGE:
 DESCRIPTION:
    goClosure minify <inputfile> <outputfile>
 
+OPTIONS:
+    --advanced, -a	sets compilation level to advanced
+    --whitespace, -w	sets compilation level to white space only
 
 ```
 Example:
 ```
-goClosure minify site.js site.min.js
+goClosure minify -w site.js site.min.js
 ```
 
 ### Concat and Minify
 
-```	
+```
 NAME:
    all - Both Concat and Minify. Input is same as concat
 
@@ -102,9 +105,10 @@ DESCRIPTION:
 OPTIONS:
    --path, -p "none"	Changes the path root for the js files listed in the html input file. Syntax <oldPath>:<newPath>
    --modify, -m "none"	Changes input html file <script> tags replacing the many old js files with one concated new file
-
+   --advanced, -a	sets compilation level to advanced
+   --whitespace, -w	sets compilation level to white space only
 ```
 Example:
 ```
-goClosure all index.html site.min.js -m /assets/js -p /assets/:www/
+goClosure all -a index.html site.min.js -m /assets/js -p /assets/:www/
 ```
